@@ -1,10 +1,10 @@
 <template>
   <div class="flex h-screen w-screen items-center justify-center bg-black">
     <div class="fixed top-10 left-10 border-2 border-black bg-gray-100 w-48 z-50">
-      <input class="block w-full border-b" v-model="imageUrl">
-      <input class="block w-full border-b" v-model="backgroundImageUrl">
-      <input class="block w-full border-b" v-model="barSpeed" type="range" min="0.1" max="10" step="0.1">
-      <input class="block w-full border-b" v-model="barHeight" type="number">
+      <input class="block w-full border-b" placeholder="Image URL" v-model="imageUrl">
+      <input class="block w-full border-b" placeholder="Background URL" v-model="backgroundImageUrl">
+      <input class="block w-full border-b" title="Speed" v-model="barSpeed" type="range" min="0.1" max="10" step="0.1">
+      <input class="block w-full border-b" title="Height" v-model="barHeight" type="number">
       <button class="bg-blue-500 text-white w-full" @click="copyLink">Copy Link</button>
       <button class="bg-blue-500 text-white w-full" @click="gotoLink">Go To Link</button>
 
@@ -67,7 +67,7 @@ export default {
       const baseUrl = import.meta.env.BASE_URL
 
       if (baseUrl === '/') {
-        const url = window.location.origin + this.$refs.copyInput.value
+        const url = window.location.origin + '/' + this.$refs.copyInput.value
         navigator.clipboard.writeText(url)
       } else {
         const url = window.location.origin + import.meta.env.BASE_URL + this.$refs.copyInput.value
