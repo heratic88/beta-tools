@@ -19,6 +19,16 @@ const router = createRouter({
       name: 'roller',
       component: () => import('../views/RollerView.vue')
     },
+    {
+      path: '/red-dot/new',
+      name: 'new-red-dot',
+      component: () => import('../views/NewRedDotView.vue')
+    },
+    {
+      path: '/red-dot/:config(.*)',
+      name: 'red-dot',
+      component: () => import('../views/RedDotView.vue')
+    },
   ]
 })
 
