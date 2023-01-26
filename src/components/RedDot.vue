@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="fixed top-0 left-0 bottom-0 right-0" @mousedown="show" @mouseup="hide">
+    <button class="fixed top-0 left-0 bottom-0 right-0" @mousedown="mouseDown" @mouseup="hide" @touchstart.prevent="touchStart" @touchend.prevent="hide">
       <div class="flex fixed items-center justify-center top-0 left-0 bottom-0 right-0">
         <div class="fixed top-0 left-0 bottom-0 right-0 z-40" v-if="!alwaysVisible"></div>
 
@@ -13,7 +13,7 @@
           ref="image"
         >
       </div>
-    </div>
+    </button>
 
     <div class="dot" ref="dot" v-show="dotPositioned && !visible || alwaysVisible"></div>
 
@@ -92,21 +92,26 @@ export default {
       this.dotPositioned = true
     },
 
-    show(event) {
+    mouseDown(event) {
       if (event.which === 1) {
-        this.visible = true
-        this.startTime = performance.now()
+        this.show()
       } else {
-        this.visible = false
-        this.startTime = null
+        this.hide()
+        this.duration = null
       }
+    },
+    show() {
+      this.visible = true
+      this.startTime = performance.now()
     },
     hide() {
       this.visible = false
       this.duration = performance.now() - this.startTime
       this.startTime = null
     },
-
+    touchStart() {
+      this.visible = true
+    },
     clickImage(event) {
       this.$emit('clickImage', event)
     }
