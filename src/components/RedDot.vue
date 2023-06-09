@@ -23,6 +23,7 @@
           :class="{ 'opacity-0': !visible, 'opacity-100': visible || alwaysVisible }"
           @canplaythrough="onLoadVideo"
           @click="clickImage"
+          @timeupdate="timeChange"
           ref="video"
           v-if="videoUrl"
           loop
@@ -70,6 +71,7 @@ export default {
       startTime: null,
       duration: null,
       interacted: false,
+      needsInteraction: true,
     }
   },
 
@@ -121,8 +123,9 @@ export default {
     },
 
     checkInteraction() {
-      if (this.imageLoaded && this.interacted) {
+      if (this.imageLoaded && this.interacted && this.needsInteraction) {
         this.$refs.video.play().then(() => this.$refs.video.pause())
+        this.needsInteraction = false
       }
     },
 
@@ -162,6 +165,11 @@ export default {
       if (this.$refs.video) {
         this.$refs.video.pause()
         this.$refs.video.currentTime = 0
+      }
+    },
+    timeChange(event) {
+      if (!this.$refs.video.paused && this.visible && this.$refs.video.currentTime == 0) {
+        this.$nextTick(() => this.$refs.video.play())
       }
     },
     touchStart() {
