@@ -2,6 +2,7 @@
   <div class="flex h-screen w-screen items-center justify-center bg-black">
     <div class="fixed top-10 left-10 border-2 border-black bg-gray-100 w-48 z-50">
       <input class="block w-full border-b" placeholder="Image URL" v-model="imageUrl">
+      <input class="block w-full border-b" placeholder="Video URL" v-model="videoUrl">
       <input class="block w-full border-b" title="X Position" v-model="xPercent" type="number" min="0" max="100">
       <input class="block w-full border-b" title="Y Position" v-model="yPercent" type="number" min="0" max="100">
       <button class="bg-blue-500 text-white w-full" @click="copyLink">Copy Link</button>
@@ -12,6 +13,7 @@
 
     <RedDot
       :imageUrl="imageUrl"
+      :videoUrl="videoPreviewUrl"
       :xPercent="parseFloat(xPercent)"
       :yPercent="parseFloat(yPercent)"
       :alwaysVisible="true"
@@ -23,6 +25,7 @@
 <script>
 import { Base64 } from 'js-base64'
 import RedDot from '@/components/RedDot.vue'
+import { buildVideoUrl } from '@/helpers'
 
 const DEFAULT_IMAGE = 'https://cdni.pornpics.com/1280/1/141/21367141/21367141_014_e152.jpg'
 
@@ -33,6 +36,8 @@ export default {
       configLoaded: false,
 
       imageUrl: DEFAULT_IMAGE,
+      videoUrl: null,
+      videoPreviewUrl: null,
       xPercent: 50,
       yPercent: 50
     }
@@ -42,6 +47,7 @@ export default {
     config() {
       return {
         image: this.imageUrl,
+        video: this.videoUrl,
         x: parseFloat(this.xPercent),
         y: parseFloat(this.yPercent),
       }
@@ -53,7 +59,7 @@ export default {
 
     url() {
       return this.$router.resolve({ name: 'red-dot', params: { config: this.configString } }).href
-    }
+    },
   },
 
   methods: {
@@ -62,8 +68,8 @@ export default {
       const x = event.clientX - rect.left
       const y = event.clientY - rect.top
 
-      this.xPercent = ((x / event.target.width) * 100).toFixed(2)
-      this.yPercent = ((y / event.target.height) * 100).toFixed(2)
+      this.xPercent = ((x / rect.width) * 100).toFixed(2)
+      this.yPercent = ((y / rect.height) * 100).toFixed(2)
     },
     copyLink() {
       this.$refs.copyInput.select()
@@ -83,6 +89,23 @@ export default {
     gotoLink() {
       this.$router.push(this.url.slice(1))
     },
+  },
+
+  watch: {
+    videoUrl(value) {
+      if (value) {
+        this.videoPreviewUrl = null
+        this.imageUrl = null
+      }
+
+      buildVideoUrl(value).then(value => this.videoPreviewUrl = value)
+    },
+    imageUrl(value) {
+      if (value) {
+        this.imageUrl = null
+        this.videoUrl = null
+      }
+    }
   }
 }
 </script>

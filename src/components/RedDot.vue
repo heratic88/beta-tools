@@ -8,10 +8,24 @@
           :src="imageUrl"
           class="image object-cover overflow-hidden h-full z-20"
           :class="{ 'opacity-0': !visible, 'opacity-100': visible || alwaysVisible }"
-          @load="onLoad"
+          @load="onLoadImage"
           @click="clickImage"
           ref="image"
+          v-if="imageUrl"
         >
+
+        <video
+          class="object-cover overflow-hidden h-full z-20"
+          :class="{ 'opacity-0': !visible, 'opacity-100': visible || alwaysVisible }"
+          @canplaythrough="onLoadVideo"
+          @click="clickImage"
+          ref="video"
+          v-if="videoUrl"
+          loop
+          preload="auto"
+        >
+          <source :src="videoUrl">
+        </video>
       </div>
     </button>
 
@@ -19,7 +33,7 @@
 
     <div class="text-white text-4xl" v-if="!isLoaded">Loading, please wait...</div>
 
-    <div class="text-white text-2 fixed bottom-4 left-16 right-16 text-center" v-if="isLoaded && !visible">
+    <div class="text-white text-2 fixed bottom-4 left-16 right-16 text-center" v-if="isLoaded && !visible && !alwaysVisible" @mousedown="mouseDown" @mouseup="hide" @touchstart.prevent="touchStart" @touchend.prevent="hide">
       Focus your eyes on the red dot, then tap and hold to reveal the image
       <br/>
       Don't move your eyes! Let go as soon as you do
@@ -35,6 +49,7 @@
 export default {
   props: {
     imageUrl: String,
+    videoUrl: String,
     xPercent: Number,
     yPercent: Number,
     alwaysVisible: Boolean
@@ -71,11 +86,25 @@ export default {
   },
 
   methods: {
-    onLoad() {
+    onLoadImage() {
       this.imageLoaded = true
 
       this.$nextTick(() => {
         const rect = this.$refs.image.getBoundingClientRect()
+        this.imageWidth = rect.width
+        this.imageHeight = rect.height
+        this.offsetX = rect.left
+        this.offsetY = rect.top
+
+        this.positionDot()
+      })
+    },
+
+    onLoadVideo() {
+      this.imageLoaded = true
+
+      this.$nextTick(() => {
+        const rect = this.$refs.video.getBoundingClientRect()
         this.imageWidth = rect.width
         this.imageHeight = rect.height
         this.offsetX = rect.left
@@ -103,11 +132,20 @@ export default {
     show() {
       this.visible = true
       this.startTime = performance.now()
+
+      if (this.$refs.video) {
+        this.$refs.video.play()
+      }
     },
     hide() {
       this.visible = false
       this.duration = performance.now() - this.startTime
       this.startTime = null
+
+      if (this.$refs.video) {
+        this.$refs.video.pause()
+        this.$refs.video.currentTime = 0
+      }
     },
     touchStart() {
       this.visible = true
