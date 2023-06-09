@@ -102,8 +102,8 @@ export default {
     },
     imageUrl(value) {
       if (value) {
-        this.imageUrl = null
         this.videoUrl = null
+        this.videoPreviewUrl = null
       }
     }
   }
