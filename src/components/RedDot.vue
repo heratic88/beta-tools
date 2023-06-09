@@ -1,5 +1,9 @@
 <template>
   <div>
+    <button class="fixed top-0 left-0 bottom-0 right-0 z-10 bg-black text-white" v-if="videoUrl && !interacted" @click="interact">
+      Tap to load the eye contact challenge
+    </button>
+
     <button class="fixed top-0 left-0 bottom-0 right-0" @mousedown="mouseDown" @mouseup="hide" @touchstart.prevent="touchStart" @touchend.prevent="hide">
       <div class="flex fixed items-center justify-center top-0 left-0 bottom-0 right-0">
         <div class="fixed top-0 left-0 bottom-0 right-0 z-40" v-if="!alwaysVisible"></div>
@@ -64,7 +68,8 @@ export default {
       offsetX: null,
       offsetY: null,
       startTime: null,
-      duration: null
+      duration: null,
+      interacted: false,
     }
   },
 
@@ -102,6 +107,7 @@ export default {
 
     onLoadVideo() {
       this.imageLoaded = true
+      this.checkInteraction()
 
       this.$nextTick(() => {
         const rect = this.$refs.video.getBoundingClientRect()
@@ -112,6 +118,17 @@ export default {
 
         this.positionDot()
       })
+    },
+
+    checkInteraction() {
+      if (this.imageLoaded && this.interacted) {
+        this.$refs.video.play().then(() => this.$refs.video.pause())
+      }
+    },
+
+    interact() {
+      this.interacted = true
+      this.$nextTick(() => this.checkInteraction())
     },
 
     positionDot() {
@@ -149,6 +166,12 @@ export default {
     },
     touchStart() {
       this.visible = true
+      this.startTime = performance.now()
+
+      this.$nextTick(() => {
+        if (this.$refs.video) this.$refs.video.play()
+      })
+
     },
     clickImage(event) {
       this.$emit('clickImage', event)
