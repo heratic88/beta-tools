@@ -10,7 +10,7 @@
 
         <img
           :src="imageUrl"
-          class="image object-cover overflow-hidden h-full z-20"
+          class="image object-contain overflow-hidden max-h-full z-20"
           :class="{ 'opacity-0': !visible, 'opacity-100': visible || alwaysVisible }"
           @load="onLoadImage"
           @click="clickImage"
