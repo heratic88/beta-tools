@@ -75,6 +75,15 @@ export default {
     }
   },
 
+  mounted () {
+    window.addEventListener('orientationchange', this.onPositionUpdate)
+  },
+
+  unmounted () {
+    window.removeEventListener('orientationchange', this.onPositionUpdate)
+
+  },
+
   computed: {
     isLoaded() {
       return this.imageLoaded && this.dotPositioned
@@ -120,6 +129,13 @@ export default {
 
         this.positionDot()
       })
+    },
+
+    onPositionUpdate() {
+      if (!this.imageLoaded) return
+
+      if (this.imageUrl) this.setTimeout(this.onLoadImage, 1)
+      if (this.videoUrl) this.setTimeout(this.onLoadVideo, 1)
     },
 
     checkInteraction() {
